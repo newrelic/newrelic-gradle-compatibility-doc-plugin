@@ -1,0 +1,97 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo'
+        }
+        maven {
+            url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo1'
+        }
+        maven {
+            url 'https://repo1.maven.org/maven2'
+        }
+        maven {
+            url 'https://jcenter.bintray.com'
+        }
+    }
+    dependencies {
+        classpath 'com.newrelic.incubator:newrelic-gradle:2.1.9'
+    }
+}
+
+repositories {
+    maven {
+        url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo1'
+    }
+    maven {
+        url 'https://repo1.maven.org/maven2'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'newrelic-publish-maven'
+
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compile gradleApi()
+    compile 'org.codehaus.groovy:groovy:2.5.0'
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.28'
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    // https://mvnrepository.com/artifact/org.apache.maven/maven-artifact
+    compile group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.1'
+
+
+}
+
+group = 'com.newrelic.agent.java'
+version = project.findProperty('releaseVersion') ?: '1.0-SNAPSHOT'
+
+if (true) {
+     jar {
+        from("LICENSE")
+        manifest {
+            attributes 'Implementation-Vendor': 'New Relic, Inc',
+                    'Implementation-Version': version
+        }
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from(sourceSets.main.resources.srcDirs) { include 'README.txt' }
+
+        manifest {
+            attributes 'Implementation-Title': 'Empty Source File',
+                    'Implementation-Version': version,
+                    'Created-By': 'New Relic, Inc',
+                    'Built-By': System.getProperty('user.name'),
+                    'Built-Date': new Date(),
+                    'Specification-Version': version,
+                    'Build-Id': System.getProperty('BUILD_ID') || "None"
+        }
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from(sourceSets.main.resources.srcDirs) { include 'README.txt' }
+
+        manifest {
+            attributes 'Implementation-Title': 'Empty Java Docs File',
+                    'Implementation-Version': version,
+                    'Created-By': 'New Relic, Inc',
+                    'Built-By': System.getProperty('user.name'),
+                    'Built-Date': new Date(),
+                    'Specification-Version': version,
+                    'Build-Id': System.getProperty('BUILD_ID') || "None"
+        }
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+}
