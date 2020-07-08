@@ -5,6 +5,5 @@
 /out/
 /.settings/
 .idea
-.idea/*
 .gradle
 .build
