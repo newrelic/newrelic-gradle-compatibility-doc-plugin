@@ -7,6 +7,7 @@ package com.newrelic.agent.instrumentation.compatibility;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerConfiguration;
@@ -14,9 +15,6 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 
 import static com.newrelic.agent.instrumentation.compatibility.Constants.RANGE_SEPARATOR;
@@ -33,6 +31,7 @@ public class CompatibilitySiteTask extends DefaultTask {
     private File json;
     private File htmlDir;
 
+    @Input
     public String getTitle() {
         return this.title;
     }
@@ -41,6 +40,7 @@ public class CompatibilitySiteTask extends DefaultTask {
         this.title = title;
     }
 
+    @Input
     public String getDocumentation() {
         return this.documentation;
     }
@@ -49,6 +49,7 @@ public class CompatibilitySiteTask extends DefaultTask {
         this.documentation = documentation;
     }
 
+    @Input
     public String getUrl() {
         return this.url;
     }
@@ -57,6 +58,7 @@ public class CompatibilitySiteTask extends DefaultTask {
         this.url = url;
     }
 
+    @Input
     public String getType() {
         return this.type;
     }
