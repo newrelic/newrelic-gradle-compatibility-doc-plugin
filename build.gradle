@@ -1,35 +1,21 @@
 buildscript {
     repositories {
         maven {
-            url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo'
-        }
-        maven {
-            url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo1'
-        }
-        maven {
             url 'https://repo1.maven.org/maven2'
         }
         maven {
             url 'https://jcenter.bintray.com'
         }
     }
-    dependencies {
-        classpath 'com.newrelic.incubator:newrelic-gradle:2.1.9'
-    }
 }
 
 repositories {
-    maven {
-        url 'https://pdx-artifacts.pdx.vm.datanerd.us/repo1'
-    }
     maven {
         url 'https://repo1.maven.org/maven2'
     }
 }
 
 apply plugin: 'groovy'
-apply plugin: 'newrelic-publish-maven'
-
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -37,14 +23,9 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy:2.5.0'
-    // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: '2.3.28'
-    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    // https://mvnrepository.com/artifact/org.apache.maven/maven-artifact
     compile group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.1'
-
-
 }
 
 group = 'com.newrelic.agent.java'
