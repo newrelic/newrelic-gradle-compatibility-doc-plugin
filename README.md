@@ -4,7 +4,7 @@ gradle-compatibility-doc-plugin
 ====================================
 This plugin provides support for `generateCompatibilitySite` DSL in your gradle build files. Using maven dependency strings, you can quickly define what ranges of target libraries are supported by the agent's builtin instrumentation.
 
-:warning: This plugin has a very niche use case for the New Relic Java Agent. 
+:warning: This plugin has a very niche use case for the New Relic Java agent.
 It is not intended to be used or modified for any other environment.
 
 Open source license
