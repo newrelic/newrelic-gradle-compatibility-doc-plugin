@@ -17,8 +17,8 @@ java {
 }
 
 dependencies {
-    implementation("org.codehaus.groovy:groovy:2.5.0")
-    implementation("org.freemarker:freemarker:2.3.28")
+    implementation("org.codehaus.groovy:groovy:2.5.14")
+    implementation("org.freemarker:freemarker:2.3.30")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.apache.maven:maven-resolver-provider:3.6.1")
 }
