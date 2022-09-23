@@ -16,7 +16,7 @@ What do you need to make this work?
 ====================================
 
 Required: 
-* Gradle, minimum 5.6
+* Gradle, minimum 7.5.1
 
 Start using the plugin
 ====================================
