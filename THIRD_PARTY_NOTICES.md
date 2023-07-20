@@ -1,6 +1,6 @@
 # Third Party Notices
 
-The opensource-website uses source code from third party libraries which carry
+This project uses source code from third party libraries which carry
 their own copyright notices and license terms. These notices are provided
 below.
 
