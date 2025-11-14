@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.newrelic.agent.instrumentation.compatibility.Constants.CURRENT_VERSION;
-import static com.newrelic.agent.instrumentation.compatibility.Constants.FTL_TEMPLATE;
-import static com.newrelic.agent.instrumentation.compatibility.Constants.RANGE_SEPARATOR;
+import static com.newrelic.agent.instrumentation.compatibility.Constants.*;
 
 public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
@@ -50,6 +48,9 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
             // Generate MDX file with compatibility documentation
             processCompatibilityDocTemplate();
+
+            // Generate a simple MD file for internal reference in the agent repo
+            processSimpleCompatibilityDoc();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +123,33 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
             configuration.setLogTemplateExceptions(false);
 
-            Template template = configuration.getTemplate(FTL_TEMPLATE);
+            Template template = configuration.getTemplate(PUBLIC_DOC_FTL_TEMPLATE);
+
+            template.process(category, writer);
+
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processSimpleCompatibilityDoc() {
+        File simpleMdFile;
+        FileWriter writer;
+        try {
+            simpleMdFile = new File(this.htmlDir.getPath() + "/compatibility-requirements-java-agent-internal.md");
+            // we write this file multiple times, so we must remove it each time
+            if (htmlDir.exists()) {
+                Files.deleteIfExists(simpleMdFile.toPath());
+            }
+            writer = new FileWriter(simpleMdFile);
+
+            Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
+            configuration.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "template");
+            configuration.setDefaultEncoding("UTF-8");
+            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            configuration.setLogTemplateExceptions(false);
+
+            Template template = configuration.getTemplate(INTERNAL_DOC_FTL_TEMPLATE);
 
             template.process(category, writer);
 

@@ -7,7 +7,7 @@ package com.newrelic.agent.instrumentation.compatibility
 
 class CompatibilitySitePluginExtension {
     enum validTypes {
-        Framework, Datastore, Messaging, Other, Appserver, AI, InstanceLevelDB, Logging
+        Framework, Datastore, Messaging, Other, Appserver, AI, InstanceLevelDB, Logging, Kafka, Http
     }
     def title = ''
     def documentation = ''
