@@ -61,9 +61,6 @@
         <!-- Keep this list in order of relevance-->
 
         <ul>
-            <li> ColdFusion 10</li>
-            <li> JBoss EAP 6.0 to latest</li>
-            <li> TomEE 1.5 to latest</li>
             <#if Appserver??>
             <#list Appserver as key, value>
             <li>${key} from ${value} </li>
@@ -78,11 +75,6 @@
         <!-- Keep this list in order of relevance-->
 
         <ul>
-            <li> JAX-RS 1.0 to latest </li>
-            <li> JSF (Java Server Faces) </li>
-            <li> Quartz Job Scheduler 1.8.3 to 2.2.x </li>
-            <li> Spring Boot 1.4 to latest </li>
-            <li> Struts 2.0.5 to latest </li>
             <#if Framework??>
             <#list Framework as key, value>
             <li> ${key} from ${value} </li>
@@ -96,7 +88,6 @@
                     href="/docs/agents/java-agent/installation/java-agent-manual-installation">Install the Java agent</a>.</p>
 
         <ul>
-            <li> HttpURLConnection (java.net) </li>
             <#if Messaging??>
             <#list Messaging as key, value>
             <li> ${key} from ${value} </li>

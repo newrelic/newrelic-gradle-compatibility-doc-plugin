@@ -8,7 +8,8 @@ package com.newrelic.agent.instrumentation.compatibility;
 public final class Constants {
     static final String RANGE_SEPARATOR = " to ";
     static final String CURRENT_VERSION = "latest";
-    static final String FTL_TEMPLATE = "docs-style.ftl";
+    static final String FTL_TEMPLATE = "compatibility-doc.ftl";
+    static final String EXCLUSIVE_SUFFIX = " (exclusive)";
     private Constants(){
 
     throw new AssertionError();

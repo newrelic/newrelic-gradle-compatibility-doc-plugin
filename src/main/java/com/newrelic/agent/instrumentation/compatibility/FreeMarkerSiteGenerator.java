@@ -18,14 +18,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.TreeMap;
 
 import static com.newrelic.agent.instrumentation.compatibility.Constants.CURRENT_VERSION;
 import static com.newrelic.agent.instrumentation.compatibility.Constants.FTL_TEMPLATE;
@@ -35,7 +31,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
     private final File jsonFile;
     private final File htmlDir;
-    private final Category category = new Category(new HashMap<String, Map<String,String>>());
+    private final Category category = new Category(new HashMap<String, TreeMap<String,String>>());
 
 
     public FreeMarkerSiteGenerator(File jsonFile, File htmlFile) {
@@ -52,10 +48,8 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
             writeJson(title, type, range);
             processJson();
 
-            copyCssResources();
-            copyImgResources();
-            // This will remove the existing html, and build a new with the data in the aforementioned json file
-            processIndexPageTemplate();
+            // Generate MDX file with compatibility documentation
+            processCompatibilityDocTemplate();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,39 +104,17 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
     }
 
-    private void copyCssResources() throws IOException {
-        Path path = Files.createDirectories(Paths.get(htmlDir.getAbsolutePath() + "/css/"));
-        copyResources(path, "css/", "bootstrap.css");
-        copyResources(path, "css/", "bootstrap-responsive.css");
-    }
 
-    private void copyImgResources() throws IOException {
-        Path path = Files.createDirectories(Paths.get(htmlDir.getAbsolutePath() + "/img/"));
-        copyResources(path, "img/", "newrelic-logo.png");
-    }
-
-    private void copyResources(Path path, String subdir, String resource) throws IOException {
-        if (Files.exists(Paths.get(path.toString() + "/" + resource))) {
-            return;
-        }
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(subdir + resource);
-        try {
-            Files.copy(in, Paths.get(path.toString() + "/" + resource), REPLACE_EXISTING);
-        } catch (IOException e) {
-            //this causes an error the first time you run it, but it doesn't seem to break anything, so ignoring for now
-        }
-    }
-
-    private void processIndexPageTemplate() {
-        File htmlFile;
+    private void processCompatibilityDocTemplate() {
+        File mdxFile;
         FileWriter writer;
         try {
-            htmlFile = new File(this.htmlDir.getPath() + "/index.html");
+            mdxFile = new File(this.htmlDir.getPath() + "/compatibility-requirements-java-agent.mdx");
             // we write this file multiple times, so we must remove it each time
             if (htmlDir.exists()) {
-                Files.deleteIfExists(htmlFile.toPath());
+                Files.deleteIfExists(mdxFile.toPath());
             }
-            writer = new FileWriter(htmlFile);
+            writer = new FileWriter(mdxFile);
 
             Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
             configuration.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "template");

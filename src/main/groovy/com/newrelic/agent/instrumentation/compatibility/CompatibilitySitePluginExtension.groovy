@@ -7,8 +7,7 @@ package com.newrelic.agent.instrumentation.compatibility
 
 class CompatibilitySitePluginExtension {
     enum validTypes {
-        Framework, Datastore, Messaging, Other, Appserver
-
+        Framework, Datastore, Messaging, Other, Appserver, AI, InstanceLevelDB, Logging
     }
     def title = ''
     def documentation = ''
@@ -16,6 +15,7 @@ class CompatibilitySitePluginExtension {
     def url = ''
     def type = ''
     def versionOverride = ''
+    def types = []
 
     void title(info) {
         this.title = info
@@ -30,23 +30,18 @@ class CompatibilitySitePluginExtension {
     }
 
     void type(info) {
-        if (info == validTypes.Appserver.toString()) {
-            type = info
-        } else if (info == validTypes.Framework.toString()) {
-            type = info
-        } else if (info == validTypes.Datastore.toString()) {
-            type = info
-        } else if (info == validTypes.Messaging.toString()) {
-            type = info
-        } else if (info == validTypes.Other.toString()) {
-            type = info
-        } else {
-            print(String.format("Invalid type %s specified for site task. Must be one of: \n", info))
-            for (t in validTypes.values()) {
-                println(t.toString())
+        def possibleTypes = info.split(", ")
+        for (String t : possibleTypes) {
+            if (! (t in (validTypes.values().collect {it.name() }))) {
+                print(String.format("Invalid type %s specified for site task. Must be one of: \n", t))
+                for (validType in validTypes.values()) {
+                    println(validType.name())
+                }
+                throw new RuntimeException()
             }
-            throw new RuntimeException()
         }
+        types = possibleTypes
+
     }
 
     void versionOverride(info) {

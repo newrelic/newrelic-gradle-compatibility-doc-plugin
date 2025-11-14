@@ -10,15 +10,15 @@ import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
-import static com.newrelic.agent.instrumentation.compatibility.Constants.CURRENT_VERSION;
-import static com.newrelic.agent.instrumentation.compatibility.Constants.RANGE_SEPARATOR;
+import static com.newrelic.agent.instrumentation.compatibility.Constants.*;
 
 public class Category {
 
-    private Map<String, Map<String, String>> category;
+    private Map<String, TreeMap<String, String>> category;
 
-    public Category(Map<String, Map<String, String>> category) {
+    public Category(Map<String, TreeMap<String, String>> category) {
         this.category = category;
     }
 
@@ -60,20 +60,38 @@ public class Category {
         String oldTo = oldRange.split(RANGE_SEPARATOR)[1];
         String newTo = newRange.split(RANGE_SEPARATOR)[1];
 
-        if (oldTo.contains(CURRENT_VERSION) || newTo.contains(CURRENT_VERSION)) {
+        // Check if either bound is exclusive
+        boolean oldExclusive = oldTo.endsWith(EXCLUSIVE_SUFFIX);
+        boolean newExclusive = newTo.startsWith(EXCLUSIVE_SUFFIX);
+
+        // Remove the exclusive suffix for version comparison
+        String oldToVersion = oldExclusive ? oldTo.substring(0, oldTo.length() - EXCLUSIVE_SUFFIX.length()) : oldTo;
+        String newToVersion = newExclusive ? newTo.substring(0, newTo.length() - EXCLUSIVE_SUFFIX.length()) : newTo;
+
+        if (oldToVersion.contains(CURRENT_VERSION) || newToVersion.contains(CURRENT_VERSION)) {
             mRange.append(CURRENT_VERSION);
         } else {
-            if (compareVersion(oldTo, newTo) > 0) {
+            int comparison = compareVersion(oldToVersion, newToVersion);
+            if (comparison > 0) {
+                // oldTo is greater - use it with its exclusivity marker
                 mRange.append(oldTo);
-            } else {
+            } else if (comparison < 0) {
+                // newTo is greater - use it with its exclusivity marker
                 mRange.append(newTo);
+            } else {
+                // Versions are equal - if either is inclusive, use inclusive
+                if (!oldExclusive){
+                    mRange.append(oldTo);
+                } else {
+                    mRange.append(newTo);
+                }
             }
         }
         return mRange.toString();
     }
 
-    private static Map<String, String> addArtifact(JSONObject object) {
-        Map<String, String> artifact = new HashMap<>();
+    private static TreeMap<String, String> addArtifact(JSONObject object) {
+        TreeMap<String, String> artifact = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         String title = String.valueOf(object.get("title"));
         String range = String.valueOf(object.get("range"));

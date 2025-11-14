@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.SortedSet;
 
-import static com.newrelic.agent.instrumentation.compatibility.Constants.RANGE_SEPARATOR;
+import static com.newrelic.agent.instrumentation.compatibility.Constants.*;
 
 public class CompatibilitySiteTask extends DefaultTask {
 
@@ -25,7 +25,7 @@ public class CompatibilitySiteTask extends DefaultTask {
 
     private String title;
     private String documentation;
-    private String type;
+    private String[] types;
     private String url;
     private String range;
     private File json;
@@ -59,20 +59,25 @@ public class CompatibilitySiteTask extends DefaultTask {
     }
 
     @Input
-    public String getType() {
-        return this.type;
+    public String[] getTypes() {
+        return this.types;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTypes(String[] types) {
+        this.types = types;
     }
 
-    public void setRange(SortedSet<DefaultTask> range) throws Exception {
+    public void setRange(SortedSet<DefaultTask> range, boolean upperBoundExclusive) throws Exception {
         if (range.size() > 2) throw new RuntimeException("More than one version is not allowed");
         StringBuilder sb = new StringBuilder();
         sb.append(String.valueOf(range.first()));
         sb.append(RANGE_SEPARATOR);
-        if (range.size() == 2) sb.append(String.valueOf(range.last()));
+        if (range.size() == 2) {
+            sb.append(String.valueOf(range.last()));
+            if (upperBoundExclusive) {
+                sb.append(EXCLUSIVE_SUFFIX);
+            }
+        }
         this.range = sb.toString();
     }
 
@@ -92,12 +97,14 @@ public class CompatibilitySiteTask extends DefaultTask {
 
     @TaskAction
     public void generate() {
-        workerExecutor.submit(CompatibilitySiteRunnable.class, new Action<WorkerConfiguration>() {
-            @Override
-            public void execute(WorkerConfiguration config) {
-                config.setIsolationMode(IsolationMode.NONE);
-                config.params(getName(), title, documentation, type, url, range, json, htmlDir);
-            }
-        });
+        for (String t : types) {
+            workerExecutor.submit(CompatibilitySiteRunnable.class, new Action<WorkerConfiguration>() {
+                @Override
+                public void execute(WorkerConfiguration config) {
+                    config.setIsolationMode(IsolationMode.NONE);
+                    config.params(getName(), title, documentation, t, url, range, json, htmlDir);
+                }
+            });
+        }
     }
 }
