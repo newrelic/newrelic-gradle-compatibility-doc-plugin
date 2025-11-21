@@ -28,7 +28,7 @@ group = "com.newrelic.agent.java"
 // -Prelease=true will render a non-snapshot version
 // All other values (including unset) will render a snapshot version.
 val release: String? by project
-version = "1.1" + if("true" == release) "" else "-SNAPSHOT"
+version = "1.2" + if("true" == release) "" else "-SNAPSHOT"
 
 tasks.jar {
     from ("LICENSE")
@@ -52,8 +52,8 @@ gradlePlugin {
 publishing {
     repositories {
         maven {
-            val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            val releasesRepoUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+            val snapshotsRepoUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
                 username = System.getenv("SONATYPE_USERNAME")
