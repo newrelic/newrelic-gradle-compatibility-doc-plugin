@@ -29,7 +29,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
     private final File jsonFile;
     private final File htmlDir;
-    private final Category category = new Category(new HashMap<String, TreeMap<String,String>>());
+    private final Category category = new Category(new HashMap<String, TreeMap<String,ArtifactInfo>>());
 
 
     public FreeMarkerSiteGenerator(File jsonFile, File htmlFile) {
@@ -39,11 +39,15 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
     @Override
     public void generate(String taskName, String title, String documentation, String type, String url, String range) {
+        generate(taskName, title, documentation, type, url, range, null);
+    }
+
+    public void generate(String taskName, String title, String documentation, String type, String url, String range, String details) {
         try {
             htmlDir.mkdirs();
             // Because gradle can't keep state between projects, we have to append the current projects data to a file,
             // on disk and read it back on each subsequent project evaluation
-            writeJson(title, type, range);
+            writeJson(title, type, range, details);
             processJson();
 
             // Generate MDX file with compatibility documentation
@@ -79,7 +83,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
     }
 
-    private void writeJson(String title, String type,String range) {
+    private void writeJson(String title, String type, String range, String details) {
         JSONObject project = new JSONObject();
         JSONObject projectDetails = new JSONObject();
 
@@ -93,6 +97,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
         projectDetails.put("range", newRange.toString());
         projectDetails.put("title", title);
+        projectDetails.put("details", details != null && !details.isEmpty() ? details : "");
         project.put("type", type);
         project.put("artifact", projectDetails);
 

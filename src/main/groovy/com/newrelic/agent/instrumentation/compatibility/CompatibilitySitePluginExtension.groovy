@@ -16,6 +16,7 @@ class CompatibilitySitePluginExtension {
     def type = ''
     def versionOverride = ''
     def types = []
+    def details = ''
 
     void title(info) {
         this.title = info
@@ -46,6 +47,10 @@ class CompatibilitySitePluginExtension {
 
     void versionOverride(info) {
         versionOverride = info
+    }
+
+    void details(info) {
+        details = info
     }
 
 }

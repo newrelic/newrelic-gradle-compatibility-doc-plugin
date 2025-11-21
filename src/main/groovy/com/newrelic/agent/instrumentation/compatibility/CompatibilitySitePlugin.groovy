@@ -58,6 +58,7 @@ class CompatibilitySitePlugin implements Plugin<Project> {
         String title = compatibilityPluginExtension.getTitle()
         String[] types = compatibilityPluginExtension.getTypes()
         String versionOverride = compatibilityPluginExtension.getVersionOverride()
+        String details = compatibilityPluginExtension.getDetails()
         // documentation and url are current unused
         String documentation = compatibilityPluginExtension.getDocumentation()
         String url = compatibilityPluginExtension.getUrl()
@@ -96,6 +97,7 @@ class CompatibilitySitePlugin implements Plugin<Project> {
             setUrl(url)
             setTypes(types)
             setRange(range, upperBoundExclusive)
+            setDetails(details)
 
             jsonOutput = project.file("${project.rootDir}" + DEFAULT_JSON_OUTPUT)
             htmlOutput = project.file("${project.rootDir}" + DEFAULT_OUTPUT_DIR)

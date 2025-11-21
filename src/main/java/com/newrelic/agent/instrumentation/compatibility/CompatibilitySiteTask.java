@@ -30,6 +30,7 @@ public class CompatibilitySiteTask extends DefaultTask {
     private String range;
     private File json;
     private File htmlDir;
+    private String details;
 
     @Input
     public String getTitle() {
@@ -81,6 +82,10 @@ public class CompatibilitySiteTask extends DefaultTask {
         this.range = sb.toString();
     }
 
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
     public void setJsonFile(File json) {
         this.json = json;
     }
@@ -102,7 +107,7 @@ public class CompatibilitySiteTask extends DefaultTask {
                 @Override
                 public void execute(WorkerConfiguration config) {
                     config.setIsolationMode(IsolationMode.NONE);
-                    config.params(getName(), title, documentation, t, url, range, json, htmlDir);
+                    config.params(getName(), title, documentation, t, url, range, json, htmlDir, details);
                 }
             });
         }

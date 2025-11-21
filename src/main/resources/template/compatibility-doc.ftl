@@ -47,44 +47,22 @@ Before you install the Java agent, ensure your system meets these requirements:
       <tbody>
         <tr>
           <td>
-            Java 7
+            Java 25
           </td>
 
           <td>
-            v3.0.0 to v6.5.0, v6.5.2, v6.5.3, and v6.5.4
+            v8.25.0 to current
           </td>
         </tr>
-
         <tr>
           <td>
-            Java 8
+            Java 24
           </td>
 
           <td>
-            v3.10.0 to current
+            v8.20.0 to current
           </td>
         </tr>
-
-        <tr>
-          <td>
-            Java 11
-          </td>
-
-          <td>
-            v4.7.0 to current
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            Java 17
-          </td>
-
-          <td>
-            v7.4.0 to current
-          </td>
-        </tr>
-
         <tr>
           <td>
             Java 21
@@ -94,24 +72,40 @@ Before you install the Java agent, ensure your system meets these requirements:
             v8.7.0 to current
           </td>
         </tr>
-
         <tr>
           <td>
-            Java 23
+            Java 17
           </td>
 
           <td>
-            v8.15.0 to current
+            v7.4.0 to current
           </td>
         </tr>
-
         <tr>
           <td>
-            Java 24
+            Java 11
           </td>
 
           <td>
-            v8.20.0 to current
+            v4.7.0 to current
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Java 8
+          </td>
+
+          <td>
+            v3.10.0 to current
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Java 7
+          </td>
+
+          <td>
+            v3.0.0 to v6.5.0, v6.5.2, v6.5.3, and v6.5.4
           </td>
         </tr>
       </tbody>
@@ -150,7 +144,12 @@ The agent automatically instruments these frameworks and libraries:
     The agent automatically instruments the following app/web servers. To install the Java agent on supported app/web servers, see [Install the Java agent](/docs/agents/java-agent/installation/java-agent-manual-installation).
 
     <#list Appserver as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -163,7 +162,12 @@ The agent automatically instruments these frameworks and libraries:
     The agent automatically instruments the following frameworks. To install the Java agent on supported frameworks, see [Install the Java agent](/docs/agents/java-agent/installation/java-agent-manual-installation).
 
     <#list Framework as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
     * JSF (Java Server Faces)
   </Collapser>
@@ -177,7 +181,12 @@ The agent automatically instruments these frameworks and libraries:
     The agent automatically instruments the following HTTP libraries.
 
     <#list Http as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -191,7 +200,12 @@ The agent automatically instruments these frameworks and libraries:
     log forwarding and logs in context, see our [logging-specific documentation](/docs/logs/logs-context/java-configure-logs-context-all/).
 
     <#list Logging as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -204,14 +218,24 @@ The agent automatically instruments these frameworks and libraries:
     The agent automatically instruments the following messaging services. For instructions, see [Install the Java agent](/docs/agents/java-agent/installation/java-agent-manual-installation).
 
     <#list Messaging as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
 
     <#if Kafka??>
     The Java agent instruments the following Kafka libraries. Not all Kafka instrumentation is enabled by default. See our [Kafka documentation](docs/apm/agents/java-agent/instrumentation/java-agent-instrument-kafka-message-queues/) for more information.
 
     <#list Kafka as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
     </#if>
 
@@ -227,7 +251,12 @@ The agent automatically instruments these frameworks and libraries:
 
     * Generic JDBC (any JDBC compliant driver)
     <#list Datastore as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -243,7 +272,12 @@ The agent automatically instruments these frameworks and libraries:
 
     * Any [compatible JDBC driver](#JDBC)
     <#list InstanceLevelDB as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -255,7 +289,12 @@ The agent automatically instruments these frameworks and libraries:
   >
     If you have version 8.12.0 or higher of Java agent, you can collect AI data from certain AI libraries and frameworks. See our [AI Monitoring documentation](/docs/ai-monitoring/intro-to-ai-monitoring) for more information.
     <#list AI as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
@@ -276,7 +315,12 @@ The agent automatically instruments these frameworks and libraries:
     title="Other instrumented features"
   >
     <#list Other as key, value>
-    * ${key} ${value}
+    * ${key} ${value.range}
+    <#if value.hasDetails()>
+    <#list value.details as detail>
+      * ${detail}
+    </#list>
+    </#if>
     </#list>
   </Collapser>
 </#if>
