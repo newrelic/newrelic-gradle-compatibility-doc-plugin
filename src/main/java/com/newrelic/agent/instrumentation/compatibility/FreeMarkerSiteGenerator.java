@@ -18,24 +18,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
-import static com.newrelic.agent.instrumentation.compatibility.Constants.CURRENT_VERSION;
-import static com.newrelic.agent.instrumentation.compatibility.Constants.FTL_TEMPLATE;
-import static com.newrelic.agent.instrumentation.compatibility.Constants.RANGE_SEPARATOR;
+import static com.newrelic.agent.instrumentation.compatibility.Constants.*;
 
 public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
     private final File jsonFile;
     private final File htmlDir;
-    private final Category category = new Category(new HashMap<String, Map<String,String>>());
+    private final Category category = new Category(new HashMap<String, TreeMap<String,ArtifactInfo>>());
 
 
     public FreeMarkerSiteGenerator(File jsonFile, File htmlFile) {
@@ -45,17 +39,22 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
 
     @Override
     public void generate(String taskName, String title, String documentation, String type, String url, String range) {
+        generate(taskName, title, documentation, type, url, range, null);
+    }
+
+    public void generate(String taskName, String title, String documentation, String type, String url, String range, String details) {
         try {
             htmlDir.mkdirs();
             // Because gradle can't keep state between projects, we have to append the current projects data to a file,
             // on disk and read it back on each subsequent project evaluation
-            writeJson(title, type, range);
+            writeJson(title, type, range, details);
             processJson();
 
-            copyCssResources();
-            copyImgResources();
-            // This will remove the existing html, and build a new with the data in the aforementioned json file
-            processIndexPageTemplate();
+            // Generate MDX file with compatibility documentation
+            processCompatibilityDocTemplate();
+
+            // Generate a simple MD file for internal reference in the agent repo
+            processSimpleCompatibilityDoc();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,7 +83,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
     }
 
-    private void writeJson(String title, String type,String range) {
+    private void writeJson(String title, String type, String range, String details) {
         JSONObject project = new JSONObject();
         JSONObject projectDetails = new JSONObject();
 
@@ -98,6 +97,7 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
         projectDetails.put("range", newRange.toString());
         projectDetails.put("title", title);
+        projectDetails.put("details", details != null && !details.isEmpty() ? details : "");
         project.put("type", type);
         project.put("artifact", projectDetails);
 
@@ -110,39 +110,17 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
         }
     }
 
-    private void copyCssResources() throws IOException {
-        Path path = Files.createDirectories(Paths.get(htmlDir.getAbsolutePath() + "/css/"));
-        copyResources(path, "css/", "bootstrap.css");
-        copyResources(path, "css/", "bootstrap-responsive.css");
-    }
 
-    private void copyImgResources() throws IOException {
-        Path path = Files.createDirectories(Paths.get(htmlDir.getAbsolutePath() + "/img/"));
-        copyResources(path, "img/", "newrelic-logo.png");
-    }
-
-    private void copyResources(Path path, String subdir, String resource) throws IOException {
-        if (Files.exists(Paths.get(path.toString() + "/" + resource))) {
-            return;
-        }
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(subdir + resource);
-        try {
-            Files.copy(in, Paths.get(path.toString() + "/" + resource), REPLACE_EXISTING);
-        } catch (IOException e) {
-            //this causes an error the first time you run it, but it doesn't seem to break anything, so ignoring for now
-        }
-    }
-
-    private void processIndexPageTemplate() {
-        File htmlFile;
+    private void processCompatibilityDocTemplate() {
+        File mdxFile;
         FileWriter writer;
         try {
-            htmlFile = new File(this.htmlDir.getPath() + "/index.html");
+            mdxFile = new File(this.htmlDir.getPath() + "/compatibility-requirements-java-agent.mdx");
             // we write this file multiple times, so we must remove it each time
             if (htmlDir.exists()) {
-                Files.deleteIfExists(htmlFile.toPath());
+                Files.deleteIfExists(mdxFile.toPath());
             }
-            writer = new FileWriter(htmlFile);
+            writer = new FileWriter(mdxFile);
 
             Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
             configuration.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "template");
@@ -150,7 +128,33 @@ public class FreeMarkerSiteGenerator implements CompatibilitySiteGenerator {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
             configuration.setLogTemplateExceptions(false);
 
-            Template template = configuration.getTemplate(FTL_TEMPLATE);
+            Template template = configuration.getTemplate(PUBLIC_DOC_FTL_TEMPLATE);
+
+            template.process(category, writer);
+
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processSimpleCompatibilityDoc() {
+        File simpleMdFile;
+        FileWriter writer;
+        try {
+            simpleMdFile = new File(this.htmlDir.getPath() + "/compatibility-requirements-java-agent-internal.md");
+            // we write this file multiple times, so we must remove it each time
+            if (htmlDir.exists()) {
+                Files.deleteIfExists(simpleMdFile.toPath());
+            }
+            writer = new FileWriter(simpleMdFile);
+
+            Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
+            configuration.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "template");
+            configuration.setDefaultEncoding("UTF-8");
+            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            configuration.setLogTemplateExceptions(false);
+
+            Template template = configuration.getTemplate(INTERNAL_DOC_FTL_TEMPLATE);
 
             template.process(category, writer);
 

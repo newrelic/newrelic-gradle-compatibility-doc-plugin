@@ -42,7 +42,7 @@ class CompatibilitySitePlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             // site and title are required to generate the html
-            if (!project.getExtensions()["site"]["title"].isEmpty() && !project.getExtensions()["site"]["type"].isEmpty()) {
+            if (!project.getExtensions()["site"]["title"].isEmpty() && !(project.getExtensions()["site"]["types"].length == 0)) {
                 addSiteTask(project, compatibilityPlugin, tasks)
             }
             for (Task task : tasks) {
@@ -56,8 +56,9 @@ class CompatibilitySitePlugin implements Plugin<Project> {
         String passes = project.extensions.getByName("verifyInstrumentation").passes().keySet().take(1)[0]
 
         String title = compatibilityPluginExtension.getTitle()
-        String type = compatibilityPluginExtension.getType()
+        String[] types = compatibilityPluginExtension.getTypes()
         String versionOverride = compatibilityPluginExtension.getVersionOverride()
+        String details = compatibilityPluginExtension.getDetails()
         // documentation and url are current unused
         String documentation = compatibilityPluginExtension.getDocumentation()
         String url = compatibilityPluginExtension.getUrl()
@@ -65,18 +66,23 @@ class CompatibilitySitePlugin implements Plugin<Project> {
         List<String> versions
         // Store the ranges in a set sorted by Maven's version
         SortedSet<DefaultArtifactVersion> range = new TreeSet<>()
+        boolean upperBoundExclusive = false
+
         if (!versionOverride.isEmpty()) {
             versions = getRangeList(versionOverride)
+            upperBoundExclusive = isUpperBoundExclusive(versionOverride)
             for (String version : versions) {
                 range.add(new DefaultArtifactVersion(version))
             }
         } else if (passesOnly != null) {
             versions = getRangeList(passesOnly)
+            upperBoundExclusive = isUpperBoundExclusive(passesOnly)
             for (String version : versions) {
                 range.add(new DefaultArtifactVersion(version))
             }
         } else if (passes != null) {
             versions = getRangeList(passes)
+            upperBoundExclusive = isUpperBoundExclusive(passes)
             for (String version : versions) {
                 range.add(new DefaultArtifactVersion(version))
             }
@@ -85,12 +91,13 @@ class CompatibilitySitePlugin implements Plugin<Project> {
             throw new RuntimeException("There must be a valid range")
         }
 
-        def task = project.task(compatibilityPluginExtension, type: CompatibilitySiteTask) {
+        def task = project.task("${title}compatibilityPluginExtension", type: CompatibilitySiteTask) {
             setTitle(title)
             setDocumentation(documentation)
             setUrl(url)
-            setType(type)
-            setRange(range)
+            setTypes(types)
+            setRange(range, upperBoundExclusive)
+            setDetails(details)
 
             jsonOutput = project.file("${project.rootDir}" + DEFAULT_JSON_OUTPUT)
             htmlOutput = project.file("${project.rootDir}" + DEFAULT_OUTPUT_DIR)
@@ -112,5 +119,16 @@ class CompatibilitySitePlugin implements Plugin<Project> {
                 versions = range.substring(index + 1, range.length() - 1).split(',')
             }
         return versions
+    }
+
+    private boolean isUpperBoundExclusive(String range) {
+        // Check if the range has a closing parenthesis which indicates exclusive upper bound
+        // Maven version range syntax: [1.0,2.0) means 1.0 <= version < 2.0
+        // [1.0,2.0] means 1.0 <= version <= 2.0
+        int bracketIndex = range.indexOf("[")
+        if (bracketIndex != -1) {
+            return range.trim().endsWith(")")
+        }
+        return false
     }
 }

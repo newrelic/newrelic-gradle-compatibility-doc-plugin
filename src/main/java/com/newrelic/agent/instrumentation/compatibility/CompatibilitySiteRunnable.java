@@ -22,9 +22,10 @@ public class CompatibilitySiteRunnable implements Runnable {
     private String type;
     private String url;
     private String range;
+    private String details;
 
     @Inject
-    public CompatibilitySiteRunnable(String taskName, String title, String documentation, String type, String url, String range, File json, File htmlDir) {
+    public CompatibilitySiteRunnable(String taskName, String title, String documentation, String type, String url, String range, File json, File htmlDir, String details) {
         this.taskName = taskName;
         this.title = title;
         this.documentation = documentation;
@@ -33,10 +34,11 @@ public class CompatibilitySiteRunnable implements Runnable {
         this.range = range;
         this.json = json;
         this.htmlDir = htmlDir;
+        this.details = details;
     }
 
     public void run() {
-        new FreeMarkerSiteGenerator(json, htmlDir).generate(taskName, title, documentation, type, url, range);
+        new FreeMarkerSiteGenerator(json, htmlDir).generate(taskName, title, documentation, type, url, range, details);
     }
 
 }

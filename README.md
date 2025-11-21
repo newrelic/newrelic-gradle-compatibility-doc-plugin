@@ -60,30 +60,54 @@ Configuring the plugin
 ```gradle
 site {
     title 'Anorm'
-    type 'Datastore'
+    type 'Datastore, Framework'
     versionOverride '[1.0,)'
+    details 'Since Agent x.x.x, Compatible with Scala x.x.x'
 }
 ```
 
-Note: `versionOverride` is optional, otherwise the versions are picked up from the `verifyInstrumentation` block in the instrumentation gradle file.
+### title
+*Required*:  The display name to use for this artifact. All artifacts with the same `title` will be merged together and displayed as one artifact. 
 
-### Type options:
-* 'Datastore'
-* 'Framework'
-* 'Appserver'
-* 'Messaging'
-* 'Other'
+### type
+*Required*: A comma-separated list of categorie(s) this artifact belongs to. Multiple types may be used. 
+
+#### Type options:
+* Appserver
+* Framework
+* Http
+* Logging
+* Messaging
+* Kafka
+* Datastore
+* InstanceLevelDB
+* AI
+* Other
+
+### versionOverride
+*Optional*: A string specifying the version range to use for this artifact. If not specified, the versions are picked up from the `verifyInstrumentation` block in the instrumentation gradle file.
+This shouldn't be necessary to configure for most modules - its main use cases are JRE modules and any other modules without a `verifyInstrumentation` block.
+
+### details
+*Optional*: A comma-separated list of additional details that should be displayed beneath this artifact in the generated doc. Artifacts sharing the
+same `title` will have their `details` lists concatenated. 
 
 Running the plugin
 ====================================
 
 Run the plugin with the generateCompatibilitySite task.
 
-To generate an html page including all instrumentation:
+To generate markdown pages including all instrumentation:
 
 ```bash
-.../java_agent/$ ./gradlew generateCompatibilitySite
+.../newrelic-java-agent/$ ./gradlew generateCompatibilitySite
 ```
+
+This will output three files into the `newrelic-java-agent/build/docs/site` directory:
+
+- `compatibility-requirements-java-agent.mdx` : A fully fledged compatibility document, formatted specially for our public docs website. 
+- `compatibility-requirements-java-agent-internal.md` : A simplified compatibility document, formatted as simple markdown, for use inside the agent repo.
+- `compatibility.json` : A `json` blob containing all compatibility information. The `json` is used to build the two markdown files.
 
 Development
 ====================================
@@ -109,7 +133,8 @@ pluginManagement {
   }
 ```
 
-This should pick up your local version of the plugin.
+This should pick up your local version of the plugin. Also check that your buildscript is looking for the right version 
+of the plugin. Locally build versions will be suffixed with `-SNAPSHOT`.
 
 Support
 ====================================
