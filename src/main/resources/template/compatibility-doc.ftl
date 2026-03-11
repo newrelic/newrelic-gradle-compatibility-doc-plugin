@@ -47,6 +47,15 @@ Before you install the Java agent, ensure your system meets these requirements:
       <tbody>
         <tr>
           <td>
+            Java 26
+          </td>
+
+          <td>
+            v9.2.0 to current
+          </td>
+        </tr>
+        <tr>
+          <td>
             Java 25
           </td>
 
