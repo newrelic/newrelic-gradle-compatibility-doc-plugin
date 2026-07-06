@@ -28,7 +28,7 @@ group = "com.newrelic.agent.java"
 // -Prelease=true will render a non-snapshot version
 // All other values (including unset) will render a snapshot version.
 val release: String? by project
-version = "1.3" + if("true" == release) "" else "-SNAPSHOT"
+version = "1.4" + if("true" == release) "" else "-SNAPSHOT"
 
 tasks.jar {
     from ("LICENSE")
@@ -106,5 +106,11 @@ afterEvaluate {
         useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign(publishing.publications["gradle-compatibility-doc-pluginPluginMarkerMaven"])
         sign(publishing.publications["mavenJava"])
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (hasTask(":publishToMavenLocal")) {
+        tasks.withType<Sign>().configureEach { isEnabled = false }
     }
 }
