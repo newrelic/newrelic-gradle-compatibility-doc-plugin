@@ -7,7 +7,6 @@ package com.newrelic.agent.instrumentation.compatibility;
 
 import org.gradle.api.Project;
 
-import javax.inject.Inject;
 import java.io.File;
 
 public class CompatibilitySiteRunnable implements Runnable {
@@ -24,7 +23,6 @@ public class CompatibilitySiteRunnable implements Runnable {
     private String range;
     private String details;
 
-    @Inject
     public CompatibilitySiteRunnable(String taskName, String title, String documentation, String type, String url, String range, File json, File htmlDir, String details) {
         this.taskName = taskName;
         this.title = title;
