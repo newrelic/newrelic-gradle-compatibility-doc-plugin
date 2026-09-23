@@ -28,7 +28,7 @@ group = "com.newrelic.agent.java"
 // -Prelease=true will render a non-snapshot version
 // All other values (including unset) will render a snapshot version.
 val release: String? by project
-version = "1.4" + if("true" == release) "" else "-SNAPSHOT"
+version = "1.5" + if("true" == release) "" else "-SNAPSHOT"
 
 tasks.jar {
     from ("LICENSE")
